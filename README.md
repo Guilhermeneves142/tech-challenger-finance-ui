@@ -84,7 +84,7 @@ Os tokens definem variáveis para `:root` e `.dark`. Basta adicionar a classe
 ## Componentes incluídos
 
 `Button`, `Badge`, `Input`, `Label`, `Card`, `Textarea`, `Dialog`, `Calendar`,
-`Popover`, `RadioGroup`, `Select`, `Tabs`, `Table`, `Pagination`, `DataTable`,
+`Popover`, `RadioGroup`, `Select`, `Tabs`, `Table`, `Pagination`, `DataTable`, `Field`
 além do utilitário `cn`.
 
 ## Exports

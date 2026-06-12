@@ -1,6 +1,6 @@
 {
   "name": "@vandrei/finance-ui",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Design system do FinanceApp — tokens (CSS variables), tipografia e componentes React baseados em Tailwind v4 + Base UI. Funciona em Next.js e React/Vite.",
   "license": "MIT",
   "author": "vandrei",
