@@ -33,24 +33,33 @@ import {
   TableHeader,
   TableRow
 } from "../table/table"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[],
   pageSize?: number,
+  infiniteScroll?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   pageSize = 10,
+  infiniteScroll = false
 }: DataTableProps<TData, TValue>) {
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize,
+    pageSize: infiniteScroll ? data.length || 9999 : pageSize,
   })
+
+  // Sincroniza pageSize quando data cresce (infinite scroll)
+  useEffect(() => {
+    if (infiniteScroll) {
+      setPagination((prev) => ({ ...prev, pageSize: data.length || 9999 }))
+    }
+  }, [infiniteScroll, data.length])
 
   const table = useReactTable({
     data,
@@ -131,50 +140,53 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-        <div className="flex-col sm:flex-row gap-3 mt-auto border-t bg-card flex justify-between items-center px-6 py-3 text-(--color-text-tertiary) rounded-bl-xl  rounded-br-xl" style={{ borderTopColor: "var(--color-brand-secondary)" }}>
-          <div className="text-caption">
-            Mostrando {table.getRowModel().rows.length} de {data.length} transações
+
+        {!infiniteScroll && (
+          <div className="flex-col sm:flex-row gap-3 mt-auto border-t bg-card flex justify-between items-center px-6 py-3 text-(--color-text-tertiary) rounded-bl-xl  rounded-br-xl" style={{ borderTopColor: "var(--color-brand-secondary)" }}>
+            <div className="text-caption">
+              Mostrando {table.getRowModel().rows.length} de {data.length} transações
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="cursor-pointer"
+              >
+                Anterior
+              </Button>
+              <Pagination>
+                <PaginationContent>
+                  {getPages().map((page, i) => (
+                    page === "..." ? (
+                      <PaginationItem key={`ellipsis-${i}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => table.setPageIndex(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  ))}
+                </PaginationContent>
+              </Pagination>
+              <Button
+                variant="outline"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="cursor-pointer"
+              >
+                Próximo
+              </Button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="cursor-pointer"
-            >
-              Anterior
-            </Button>
-            <Pagination>
-              <PaginationContent>
-                {getPages().map((page, i) => (
-                  page === "..." ? (
-                    <PaginationItem key={`ellipsis-${i}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  ) : (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        onClick={() => table.setPageIndex(page)}
-                        isActive={currentPage === page}
-                        className="cursor-pointer"
-                      >
-                        {page + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                ))}
-              </PaginationContent>
-            </Pagination>
-            <Button
-              variant="outline"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="cursor-pointer"
-            >
-              Próximo
-            </Button>
-          </div>
-        </div>
+        )}
       </div>
     </div >
   )
